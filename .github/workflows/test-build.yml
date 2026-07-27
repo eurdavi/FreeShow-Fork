@@ -1,0 +1,54 @@
+name: Test Build (Windows, unsigned)
+on:
+  push:
+    branches:
+      - "ci/win-test-build"
+  workflow_dispatch:
+
+jobs:
+  build_windows:
+    name: "Portable Windows build"
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Install Node.js and NPM
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci
+
+      # no Azure signing credentials outside the main repo
+      - name: Remove code signing config
+        shell: bash
+        run: |
+          node <<'EOF'
+          const fs = require("fs")
+          const file = "config/building/electron-builder.yaml"
+          const original = fs.readFileSync(file, "utf8")
+          const stripped = original.replace(/^ {4}azureSignOptions:\r?\n(?: {8}.*\r?\n)+/m, "")
+          if (original === stripped) throw new Error("signing config not found in electron-builder.yaml")
+          fs.writeFileSync(file, stripped)
+          EOF
+
+      - name: Build app
+        run: npm run build
+
+      - name: Package unpacked app
+        run: npx electron-builder --config config/building/electron-builder.yaml --win --dir
+
+      - name: Zip build
+        shell: bash
+        run: 7z a -tzip -mx=1 FreeShow-win-portable.zip ./dist/win-unpacked/*
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FreeShow-win-portable
+          path: FreeShow-win-portable.zip
+          compression-level: 0
+          retention-days: 14

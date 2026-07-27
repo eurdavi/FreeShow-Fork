@@ -8,7 +8,8 @@ on:
 jobs:
   build_windows:
     name: "Portable Windows build"
-    runs-on: windows-latest
+    # windows-latest ships VS18, which node-gyp cannot detect when building NDI
+    runs-on: windows-2022
 
     steps:
       - name: Check out Git repository

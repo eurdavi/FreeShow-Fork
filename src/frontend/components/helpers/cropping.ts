@@ -10,8 +10,9 @@ export interface CropState {
     mediaCropGeometry: string
 }
 
-function toCropType(type: Cropping["type"] | undefined): CropType {
-    return type === "clip" ? "clip" : "ppt"
+function toCropType(type: Cropping["type"] | undefined, defaultType: CropType = "ppt"): CropType {
+    if (type === "clip" || type === "ppt") return type
+    return defaultType
 }
 
 export function getCropValues(cropping?: Partial<Cropping> | null): CropValues {
@@ -23,10 +24,10 @@ export function getCropValues(cropping?: Partial<Cropping> | null): CropValues {
     }
 }
 
-function toCrop(cropping?: Partial<Cropping> | null) {
+function toCrop(cropping?: Partial<Cropping> | null, defaultType: CropType = "ppt") {
     return {
         ...getCropValues(cropping),
-        type: toCropType(cropping?.type)
+        type: toCropType(cropping?.type, defaultType)
     }
 }
 
@@ -88,8 +89,8 @@ function getMediaCropGeometry(crop: CropState["crop"], cropHasValues: boolean) {
     return `width: 100%;height: 100%;left: 0;top: 0;${cropHasValues ? `clip-path: ${clipPath};-webkit-clip-path: ${clipPath};` : ""}`
 }
 
-export function getCropState(cropping: Partial<Cropping> | undefined, cropPreviewMode: boolean): CropState {
-    const crop = toCrop(cropping)
+export function getCropState(cropping: Partial<Cropping> | undefined, cropPreviewMode: boolean, defaultType: CropType = "ppt"): CropState {
+    const crop = toCrop(cropping, defaultType)
     const cropHasValues = !!(crop.top || crop.right || crop.bottom || crop.left)
 
     return {

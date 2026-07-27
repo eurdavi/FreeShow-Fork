@@ -82,7 +82,8 @@
         }, 50)
     }
 
-    $: cameraCropState = getCropState(item.cropping, cropPreviewMode)
+    // camera defaults to mask cropping, so the picture is cut instead of zoomed
+    $: cameraCropState = getCropState(item.cropping, cropPreviewMode, "clip")
     $: cameraStyleString = `${cameraCropState.mediaCropGeometry}object-fit: ${item.fit || "contain"};filter: ${item.filter};transform: scale(${item.flipped ? "-1" : "1"}, ${item.flippedY ? "-1" : "1"});`
     $: variableStyleString = typeof item.style === "string" ? (item.style.includes("font-size") && item.style.split("font-size:")[1].trim()[0] !== "0" ? "" : `font-size: ${edit ? autoSize : fontSize}px;`) : ""
 </script>

@@ -323,6 +323,12 @@ const croppingRowsPercentage = splitIntoRows([
     { id: "cropping.bottom", type: "number", value: 0, values: { label: "screen.bottom (%)", max: 100, showSlider: true } },
     { id: "cropping.left", type: "number", value: 0, values: { label: "screen.left (%)", max: 100, showSlider: true } }
 ])
+
+const cropModeOptions = [
+    { value: "clip", label: "edit.crop_mask" },
+    { value: "ppt", label: "edit.crop_fill" }
+]
+const croppingRowsCamera = [[{ id: "cropping.type", type: "dropdown", value: "clip", values: { label: "edit.crop_mode", defaultValue: "clip", options: cropModeOptions } }], ...croppingRowsPercentage]
 const mediaSections: { [key: string]: EditBoxSection } = {
     default: {
         inputs: splitIntoRows([
@@ -526,7 +532,7 @@ export const itemBoxes: Box2 = {
                 ])
             },
             cropping: {
-                inputs: croppingRowsPercentage
+                inputs: croppingRowsCamera
             }
         }
     },
